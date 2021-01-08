@@ -41,6 +41,7 @@ public class Playfield {
 
         block = hintblock;
         hintblock = feed.nextBlock();
+        printer.displayHintblock(hintblock);
         row = 0;
         col = (cols - block.cols()) / 2;
         show();

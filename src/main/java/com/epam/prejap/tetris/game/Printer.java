@@ -1,28 +1,38 @@
 package com.epam.prejap.tetris.game;
 
+import com.epam.prejap.tetris.block.Block;
+
 import java.io.PrintStream;
 import java.time.Duration;
 
 public class Printer {
 
-    /**
-     * Width of the sidepanel
-     */
-    private final int PANEL_WIDTH = 6;
+
     private static final String TIME_FORMAT = "%02d:%02d:%02d";
     final PrintStream out;
     private final Timer timer;
+
+    /**
+     * Width of the side panel for hint block
+     */
+    private final int PANEL_WIDTH = 6;
 
     public Printer(PrintStream out, Timer timer) {
         this.out = out;
         this.timer = timer;
     }
 
-    byte[][] hintGrid={
-            {1, 0},
-            {1, 0},
-            {1, 1},
-    };
+    /**
+     * block to be displayed as hint of next active block
+     */
+    private Block hintBlock;
+
+    /**
+     * @param hintBlock provided by PlayField
+     */
+    void displayHintblock(Block hintBlock) {
+        this.hintBlock = hintBlock;
+    }
 
     void draw(byte[][] grid) {
         clear();
@@ -35,7 +45,7 @@ public class Printer {
             for (byte aByte : grid[row]) {
                 print(aByte);
             }
-            sidePanel(row, hintGrid);
+            sidePanel(row);
         }
         border(grid[0].length);
     }
@@ -58,6 +68,7 @@ public class Printer {
 
     /**
      * Prints top/bottom border of playfield
+     *
      * @param width of the playfield
      */
     void border(int width) {
@@ -75,16 +86,16 @@ public class Printer {
 
     /**
      * prints # row of sidePanel with next block hint
+     *
      * @param row - number od row being printed
-     * @param hintGrid - image of hinted block
      */
-    void sidePanel(int row, byte[][] hintGrid) {
+    void sidePanel(int row) {
         startRow();
-        if (row <= hintGrid.length) {
+        if (row <= hintBlock.rows()) {
             if (row == 0) out.print("NEXT: ");
             else {
                 for (int column = 0; column < PANEL_WIDTH; column++) {
-                    if (column < hintGrid[0].length) print(hintGrid[row - 1][column]);
+                    if (column < hintBlock.cols()) print(hintBlock.dotAt(row - 1, column));
                     else out.print(" ");
                 }
             }
