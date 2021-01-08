@@ -15,7 +15,7 @@ public class Playfield {
      * Block that appears in hint window.
      * It's the next active block in game after current one is consumed.
      */
-    private Block hintblock;
+    private Block hintBlock;
 
     /**
      * Active block that is currently controlled by user.
@@ -30,7 +30,7 @@ public class Playfield {
         this.feed = feed;
         this.printer = printer;
         grid = new byte[this.rows][this.cols];
-        hintblock = feed.nextBlock();
+        hintBlock = feed.nextBlock();
     }
 
     /**
@@ -38,10 +38,9 @@ public class Playfield {
      * Provides new block to appear in the hint window.
      */
     public void nextBlock() {
-
-        block = hintblock;
-        hintblock = feed.nextBlock();
-        printer.displayHintblock(hintblock);
+        block = hintBlock;
+        hintBlock = feed.nextBlock();
+        printer.displayHintblock(hintBlock);
         row = 0;
         col = (cols - block.cols()) / 2;
         show();

@@ -47,4 +47,8 @@ public class PrinterTest {
         Mockito.verify(printer).header();
         assertTrue(bos.toString().contains(message));
     }
+
+    @Test
+    public void testSidePanel() {
+    }
 }
