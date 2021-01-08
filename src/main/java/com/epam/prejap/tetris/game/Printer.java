@@ -56,8 +56,12 @@ public class Printer {
         out.println("|");
     }
 
+    /**
+     * Prints top/bottom border of playfield
+     * @param width of the playfield
+     */
     void border(int width) {
-        out.println("+" + "-".repeat(width) + "+");
+        out.println("+" + "-".repeat(width) + "+" + "-".repeat(PANEL_WIDTH) + "+");
     }
 
     /**
