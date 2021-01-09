@@ -39,11 +39,18 @@ public class Playfield {
      */
     public void nextBlock() {
         block = hintBlock;
-        hintBlock = feed.nextBlock();
-        printer.displayHintblock(hintBlock);
+        setHintBlock();
         row = 0;
         col = (cols - block.cols()) / 2;
         show();
+    }
+
+    /**
+     * generates next active block and sets it as hint block
+     */
+    private void setHintBlock(){
+        hintBlock = feed.nextBlock();
+        printer.displayHintblock(hintBlock);
     }
 
     public boolean move(Move move) {
