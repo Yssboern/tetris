@@ -12,9 +12,8 @@ public class Printer {
     final PrintStream out;
     private final Timer timer;
 
-    /**
-     * Width of the side panel for hint block
-     */
+
+    // Width of the side panel for hint block
     private final int PANEL_WIDTH = 6;
 
     public Printer(PrintStream out, Timer timer) {
@@ -22,9 +21,8 @@ public class Printer {
         this.timer = timer;
     }
 
-    /**
-     * block to be displayed as hint of next active block
-     */
+
+    //block to be displayed as hint of next active block
     private Block hintBlock;
 
     /**
@@ -85,11 +83,11 @@ public class Printer {
     }
 
     /**
-     * prints # row of sidePanel with next block hint
+     * Prints # row of sidePanel with next block hint
      *
      * @param row - number od row being printed
      */
-    void sidePanel(int row) {
+   private void sidePanel(int row) {
         startRow();
         if (row <= hintBlock.rows()) {
             if (row == 0) out.print("NEXT: ");
