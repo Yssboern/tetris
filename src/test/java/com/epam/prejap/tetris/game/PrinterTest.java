@@ -1,5 +1,8 @@
 package com.epam.prejap.tetris.game;
 
+import com.epam.prejap.tetris.block.Block;
+import com.epam.prejap.tetris.block.BlockFeed;
+
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -13,8 +16,12 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = "Timer")
 public class PrinterTest {
 
+    private BlockFeed feed = new BlockFeed();
+    private Block hintblock = feed.nextBlock();
+
     private ByteArrayOutputStream bos;
     private final byte[][] emptyGrid = new byte[][]{new byte[]{}};
+    private final byte[][] grid5x1 = new byte[5][1];
 
     @BeforeMethod
     public void setUp() {
@@ -38,6 +45,7 @@ public class PrinterTest {
         // given
         Timer timer = new Timer(tickDurationInMillis);
         Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer));
+        printer.displayHintblock(hintblock);
         for (int i = 0; i < cycles; i++) {
             timer.tick();
         }
@@ -47,4 +55,38 @@ public class PrinterTest {
         Mockito.verify(printer).header();
         assertTrue(bos.toString().contains(message));
     }
+
+    @Test
+    public void testSidePanel() {
+        //given
+        Timer timer = new Timer(1);
+        Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer));
+        printer.displayHintblock(hintblock);
+
+        String lBlock = "| |NEXT: |" + System.lineSeparator() +
+                "| |#     |" + System.lineSeparator() +
+                "| |#     |" + System.lineSeparator() +
+                "| |##    |" + System.lineSeparator() +
+                "| |      |";
+
+
+        String oBlock = "| |NEXT: |" + System.lineSeparator() +
+                "| |##    |" + System.lineSeparator() +
+                "| |##    |" + System.lineSeparator() +
+                "| |      |" + System.lineSeparator() +
+                "| |      |";
+
+        String iBlock = "| |NEXT: |" + System.lineSeparator() +
+                "| |#     |" + System.lineSeparator() +
+                "| |#     |" + System.lineSeparator() +
+                "| |#     |" + System.lineSeparator() +
+                "| |#     |";
+
+        //when
+        printer.draw(grid5x1);
+        //then
+        assertTrue(bos.toString().contains(lBlock)||bos.toString().contains(oBlock)||bos.toString().contains(iBlock));
+
+    }
+
 }
