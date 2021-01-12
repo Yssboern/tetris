@@ -46,9 +46,9 @@ public class Playfield {
     }
 
     /**
-     * generates next active block and sets it as hint block
+     * Generates next active block and sets it as hint block
      */
-    private void setHintBlock(){
+    private void setHintBlock() {
         hintBlock = feed.nextBlock();
         printer.displayHintblock(hintBlock);
     }

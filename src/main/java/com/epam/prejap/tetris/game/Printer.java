@@ -7,11 +7,9 @@ import java.time.Duration;
 
 public class Printer {
 
-
     private static final String TIME_FORMAT = "%02d:%02d:%02d";
     final PrintStream out;
     private final Timer timer;
-
 
     // Width of the side panel for hint block
     private final int PANEL_WIDTH = 6;
@@ -20,7 +18,6 @@ public class Printer {
         this.out = out;
         this.timer = timer;
     }
-
 
     //block to be displayed as hint of next active block
     private Block hintBlock;
@@ -87,17 +84,21 @@ public class Printer {
      *
      * @param row - number od row being printed
      */
-   private void sidePanel(int row) {
+    private void sidePanel(int row) {
         startRow();
         if (row <= hintBlock.rows()) {
-            if (row == 0) out.print("NEXT: ");
-            else {
+            if (row == 0) {
+                out.print("NEXT: ");
+            } else {
                 for (int column = 0; column < PANEL_WIDTH; column++) {
-                    if (column < hintBlock.cols()) print(hintBlock.dotAt(row - 1, column));
-                    else out.print(" ");
+                    if (column < hintBlock.cols()) {
+                        print(hintBlock.dotAt(row - 1, column));
+                    } else out.print(" ");
                 }
             }
-        } else out.print(" ".repeat(PANEL_WIDTH));
+        } else {
+            out.print(" ".repeat(PANEL_WIDTH));
+        }
         endRow();
     }
 
