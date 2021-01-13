@@ -10,12 +10,15 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.testng.Assert.assertTrue;
 
 @Test(groups = "Timer")
 public class PrinterTest {
 
+    private final int PANEL_WIDTH = 6;
     private BlockFeed feed = new BlockFeed();
     private Block hintblock = feed.nextBlock();
 
@@ -57,18 +60,17 @@ public class PrinterTest {
     }
 
     @Test
-    public void testSidePanel() {
+    public void shouldPrintHintBlockInHintPanel() {
         //given
+        var blocks = feed.blocks().stream().map(Supplier::get).collect(Collectors.toList());
         Timer timer = new Timer(1);
         Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer));
-        printer.displayHintblock(hintblock);
 
         String lBlock = "| |NEXT: |" + System.lineSeparator() +
                 "| |#     |" + System.lineSeparator() +
                 "| |#     |" + System.lineSeparator() +
                 "| |##    |" + System.lineSeparator() +
                 "| |      |";
-
 
         String oBlock = "| |NEXT: |" + System.lineSeparator() +
                 "| |##    |" + System.lineSeparator() +
@@ -93,11 +95,15 @@ public class PrinterTest {
                 "| |##    |" + System.lineSeparator() +
                 "| |      |" + System.lineSeparator() +
                 "| |      |";
-        //when
-        printer.draw(grid5x1);
-        //then
-        assertTrue(bos.toString().contains(lBlock) || bos.toString().contains(oBlock) || bos.toString().contains(iBlock) || bos.toString().contains(jBlock)|| bos.toString().contains(sBlock));
 
+        for (Block b : blocks) {
+            //when
+            printer.displayHintblock(b);
+            printer.draw(grid5x1);
+            //then
+            assertTrue(bos.toString().contains(lBlock) || bos.toString().contains(oBlock) || bos.toString().contains(iBlock) || bos.toString().contains(jBlock) || bos.toString().contains(sBlock));
+        }
     }
-
 }
+
+

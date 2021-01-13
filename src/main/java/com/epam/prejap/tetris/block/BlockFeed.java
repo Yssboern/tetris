@@ -18,7 +18,7 @@ public class BlockFeed {
         return blocks.get(rnd.nextInt(blocks.size())).get();
     }
 
-    List<Supplier<Block>> blocks() {
+    public List<Supplier<Block>> blocks() {
         return blocks;
     }
 
