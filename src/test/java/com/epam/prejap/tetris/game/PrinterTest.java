@@ -87,10 +87,16 @@ public class PrinterTest {
                 "| | #    |" + System.lineSeparator() +
                 "| |##    |" + System.lineSeparator() +
                 "| |      |";
+
+        String sBlock = "| |NEXT: |" + System.lineSeparator() +
+                "| | ##   |" + System.lineSeparator() +
+                "| |##    |" + System.lineSeparator() +
+                "| |      |" + System.lineSeparator() +
+                "| |      |";
         //when
         printer.draw(grid5x1);
         //then
-        assertTrue(bos.toString().contains(lBlock) || bos.toString().contains(oBlock) || bos.toString().contains(iBlock) || bos.toString().contains(jBlock));
+        assertTrue(bos.toString().contains(lBlock) || bos.toString().contains(oBlock) || bos.toString().contains(iBlock) || bos.toString().contains(jBlock)|| bos.toString().contains(sBlock));
 
     }
 
