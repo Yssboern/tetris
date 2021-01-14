@@ -18,9 +18,8 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = "Timer")
 public class PrinterTest {
 
-    private final int PANEL_WIDTH = 6;
-    private BlockFeed feed = new BlockFeed();
-    private Block hintblock = feed.nextBlock();
+    private final BlockFeed feed = new BlockFeed();
+    private final Block hintblock = feed.nextBlock();
 
     private ByteArrayOutputStream bos;
     private final byte[][] emptyGrid = new byte[][]{new byte[]{}};
