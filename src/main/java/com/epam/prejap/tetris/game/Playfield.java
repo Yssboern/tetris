@@ -13,6 +13,7 @@ public class Playfield {
     private final List<PlayfieldObserver> playfieldObservers;
     private final Grid grid;
     private Block block;
+    private Block hintBlock;
 
     /**
      * @param feed    block generator
@@ -25,15 +26,18 @@ public class Playfield {
         this.printer = printer;
         this.grid = grid;
         this.playfieldObservers = playfieldObservers;
+        this.hintBlock=feed.nextBlock();
     }
 
     /**
      * Generates new block starting at row 0 in the center column
      */
     public void nextBlock() {
-        block = feed.nextBlock();
+        block = hintBlock;
+        hintBlock = feed.nextBlock();
         notifyBlockObservers();
         grid.newBlock(block.cols());
+        printer.displayHintblock(hintBlock);
         show(block);
     }
 

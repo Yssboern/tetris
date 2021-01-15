@@ -1,5 +1,6 @@
 package com.epam.prejap.tetris.game;
 
+import com.epam.prejap.tetris.block.Block;
 import com.epam.prejap.tetris.block.Color;
 
 import java.io.PrintStream;
@@ -12,6 +13,11 @@ public class Printer {
     final PrintStream out;
     private final Timer timer;
     private final Referee referee;
+    private Block hintBlock;
+
+    void displayHintblock(Block hintBlock) {
+        this.hintBlock = hintBlock;
+    }
 
     public Printer(PrintStream out, Timer timer, Referee referee) {
         this.out = out;
