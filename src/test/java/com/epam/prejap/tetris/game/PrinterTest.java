@@ -1,29 +1,20 @@
 package com.epam.prejap.tetris.game;
 
-import com.epam.prejap.tetris.block.Block;
-import com.epam.prejap.tetris.block.BlockFeed;
-
+import com.epam.prejap.tetris.block.Color;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 @Test(groups = "Timer")
 public class PrinterTest {
 
-    private final BlockFeed feed = new BlockFeed();
-    private final Block hintblock = feed.nextBlock();
-
     private ByteArrayOutputStream bos;
     private final byte[][] emptyGrid = new byte[][]{new byte[]{}};
-    private final byte[][] grid5x1 = new byte[5][1];
 
     @BeforeMethod
     public void setUp() {
@@ -46,8 +37,8 @@ public class PrinterTest {
     public void drawShouldPrintValidHeader(int tickDurationInMillis, int cycles, String message) {
         // given
         Timer timer = new Timer(tickDurationInMillis);
-        Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer));
-        printer.displayHintblock(hintblock);
+        Referee referee = new Referee();
+        Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer, referee));
         for (int i = 0; i < cycles; i++) {
             timer.tick();
         }
@@ -58,51 +49,31 @@ public class PrinterTest {
         assertTrue(bos.toString().contains(message));
     }
 
-    @Test
-    public void shouldPrintHintBlockInHintPanel() {
-        //given
-        var blocks = feed.blocks().stream().map(Supplier::get).collect(Collectors.toList());
-        Timer timer = new Timer(1);
-        Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer));
 
-        String lBlock = "| |NEXT: |" + System.lineSeparator() +
-                "| |#     |" + System.lineSeparator() +
-                "| |#     |" + System.lineSeparator() +
-                "| |##    |" + System.lineSeparator() +
-                "| |      |";
 
-        String oBlock = "| |NEXT: |" + System.lineSeparator() +
-                "| |##    |" + System.lineSeparator() +
-                "| |##    |" + System.lineSeparator() +
-                "| |      |" + System.lineSeparator() +
-                "| |      |";
+    @Test(groups = "Color", dataProvider = "colors")
+    public void checkIfPrintMethodPrintsStringWithAppropriateColor(Color color) {
+        // given
+        Timer timer = Mockito.mock(Timer.class);
+        Referee referee = new Referee();
+        Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer, referee));
+        int ansiCode = color.getAnsiCode();
+        String escape =  "\u001B[";
+        String finalByte = "m";
+        String resetColor = escape + "0" + finalByte;
+        String blockMark = "#";
+        String expected = escape + ansiCode + finalByte + blockMark + resetColor;
 
-        String iBlock = "| |NEXT: |" + System.lineSeparator() +
-                "| |#     |" + System.lineSeparator() +
-                "| |#     |" + System.lineSeparator() +
-                "| |#     |" + System.lineSeparator() +
-                "| |#     |";
+        // when
+        printer.print(color.getId());
 
-        String jBlock = "| |NEXT: |" + System.lineSeparator() +
-                "| | #    |" + System.lineSeparator() +
-                "| | #    |" + System.lineSeparator() +
-                "| |##    |" + System.lineSeparator() +
-                "| |      |";
+        // then
+        assertEquals(bos.toString(), expected);
+    }
 
-        String sBlock = "| |NEXT: |" + System.lineSeparator() +
-                "| | ##   |" + System.lineSeparator() +
-                "| |##    |" + System.lineSeparator() +
-                "| |      |" + System.lineSeparator() +
-                "| |      |";
 
-        for (Block b : blocks) {
-            //when
-            printer.displayHintblock(b);
-            printer.draw(grid5x1);
-            //then
-            assertTrue(bos.toString().contains(lBlock) || bos.toString().contains(oBlock) || bos.toString().contains(iBlock) || bos.toString().contains(jBlock) || bos.toString().contains(sBlock));
-        }
+    @DataProvider
+    private Object[] colors() {
+        return Color.values();
     }
 }
-
-

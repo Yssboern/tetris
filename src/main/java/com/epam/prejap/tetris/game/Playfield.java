@@ -3,68 +3,57 @@ package com.epam.prejap.tetris.game;
 import com.epam.prejap.tetris.block.Block;
 import com.epam.prejap.tetris.block.BlockFeed;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Playfield {
 
-    private final byte[][] grid;
-    private final int rows;
-    private final int cols;
     private final Printer printer;
     private final BlockFeed feed;
-
-    /**
-     * Block that appears in hint window.
-     * It's the next active block in game after current one is consumed.
-     */
-    private Block hintBlock;
-
-    /**
-     * Active block that is currently controlled by user.
-     */
+    private final List<PlayfieldObserver> playfieldObservers;
+    private final Grid grid;
     private Block block;
-    private int row;
-    private int col;
 
-    public Playfield(int rows, int cols, BlockFeed feed, Printer printer) {
-        this.rows = rows;
-        this.cols = cols;
+    /**
+     * @param feed    block generator
+     * @param printer displays grid to user via System.out
+     * @param grid    starting
+     */
+    public Playfield(BlockFeed feed, Printer printer, Grid grid,
+                     List<PlayfieldObserver> playfieldObservers) {
         this.feed = feed;
         this.printer = printer;
-        grid = new byte[this.rows][this.cols];
-        hintBlock = feed.nextBlock();
+        this.grid = grid;
+        this.playfieldObservers = playfieldObservers;
     }
 
     /**
-     * Uses block from hint window as a new active block in game.
-     * Provides new block to appear in the hint window.
+     * Generates new block starting at row 0 in the center column
      */
     public void nextBlock() {
-        block = hintBlock;
-        setHintBlock();
-        row = 0;
-        col = (cols - block.cols()) / 2;
-        show();
+        block = feed.nextBlock();
+        notifyBlockObservers();
+        grid.newBlock(block.cols());
+        show(block);
     }
 
     /**
-     * Generates next active block and sets it as hint block
+     * Shifts current block left or right one column, then down one row
+     *
+     * @param move direction of movement
+     * @return block moved down one row
      */
-    private void setHintBlock() {
-        hintBlock = feed.nextBlock();
-        printer.displayHintblock(hintBlock);
-    }
-
     public boolean move(Move move) {
-        hide();
+        hide(block);
         boolean moved;
         switch (move) {
             case LEFT -> moveLeft();
             case RIGHT -> moveRight();
         }
         moved = moveDown();
-        show();
+        show(block);
         return moved;
     }
-
 
     private void moveRight() {
         move(0, 1);
@@ -80,57 +69,24 @@ public class Playfield {
 
     private boolean move(int rowOffset, int colOffset) {
         boolean moved = false;
-        if (isValidMove(block, rowOffset, colOffset)) {
-            doMove(rowOffset, colOffset);
+        if (grid.isValidMove(block, rowOffset, colOffset)) {
+            grid.doMove(rowOffset, colOffset);
             moved = true;
         }
         return moved;
     }
 
-    private boolean isValidMove(Block block, int rowOffset, int colOffset) {
-        for (int i = 0; i < block.rows(); i++) {
-            for (int j = 0; j < block.cols(); j++) {
-                var dot = block.dotAt(i, j);
-                if (dot > 0) {
-                    int newRow = row + i + rowOffset;
-                    int newCol = col + j + colOffset;
-                    if (newRow >= rows || newCol >= cols || grid[newRow][newCol] > 0) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+    private void hide(Block block) {
+        grid.hide(block);
     }
 
-    private void hide() {
-        forEachBrick((i, j, dot) -> grid[row + i][col + j] = 0);
+    private void show(Block block) {
+        printer.printScore();
+        grid.show(block);
+        printer.draw(grid.byteGrid);
     }
 
-    private void show() {
-        forEachBrick((i, j, dot) -> grid[row + i][col + j] = dot);
-        printer.draw(grid);
+    private void notifyBlockObservers() {
+        playfieldObservers.forEach(PlayfieldObserver::newBlockAppeared);
     }
-
-    private void doMove(int rowOffset, int colOffset) {
-        row += rowOffset;
-        col += colOffset;
-    }
-
-    private void forEachBrick(BrickAction action) {
-        for (int i = 0; i < block.rows(); i++) {
-            for (int j = 0; j < block.cols(); j++) {
-                var dot = block.dotAt(i, j);
-                if (dot > 0) {
-                    action.act(i, j, dot);
-                }
-            }
-        }
-    }
-
-    private interface BrickAction {
-        void act(int i, int j, byte dot);
-    }
-
 }
-
