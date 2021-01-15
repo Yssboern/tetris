@@ -1,5 +1,6 @@
 package com.epam.prejap.tetris.game;
 
+import com.epam.prejap.tetris.block.BlockFeed;
 import com.epam.prejap.tetris.block.Color;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
@@ -15,6 +16,7 @@ public class PrinterTest {
 
     private ByteArrayOutputStream bos;
     private final byte[][] emptyGrid = new byte[][]{new byte[]{}};
+    private final BlockFeed feed=new BlockFeed();
 
     @BeforeMethod
     public void setUp() {
@@ -39,6 +41,7 @@ public class PrinterTest {
         Timer timer = new Timer(tickDurationInMillis);
         Referee referee = new Referee();
         Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer, referee));
+        printer.displayHintblock(feed.nextBlock());
         for (int i = 0; i < cycles; i++) {
             timer.tick();
         }
@@ -49,14 +52,13 @@ public class PrinterTest {
         assertTrue(bos.toString().contains(message));
     }
 
-
-
     @Test(groups = "Color", dataProvider = "colors")
     public void checkIfPrintMethodPrintsStringWithAppropriateColor(Color color) {
         // given
         Timer timer = Mockito.mock(Timer.class);
         Referee referee = new Referee();
         Printer printer = Mockito.spy(new Printer(new PrintStream(bos), timer, referee));
+        printer.displayHintblock(feed.nextBlock());
         int ansiCode = color.getAnsiCode();
         String escape =  "\u001B[";
         String finalByte = "m";
@@ -76,4 +78,5 @@ public class PrinterTest {
     private Object[] colors() {
         return Color.values();
     }
+
 }

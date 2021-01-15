@@ -29,12 +29,14 @@ public class Printer {
         clear();
         header();
         border(grid[0].length);
-        for (byte[] bytes : grid) {
+
+        int row = 0;
+        for (; row < grid.length; row++) {
             startRow();
-            for (byte aByte : bytes) {
+            for (byte aByte : grid[row]) {
                 print(aByte);
             }
-            endRow();
+            sidePanel(row);
         }
         border(grid[0].length);
     }
@@ -47,9 +49,9 @@ public class Printer {
      * Print block mark with appropriate color, leave
      * uncoloured empty string in case of zero in game's grid
      *
-     * @param colorId   id of specific Color enumeration constant
-     * @since           0.8
-     * @see             Color
+     * @param colorId id of specific Color enumeration constant
+     * @see Color
+     * @since 0.8
      */
     void print(byte colorId) {
         String colored = Color.of(colorId).applyFor(BLOCK_MARK);
@@ -65,7 +67,7 @@ public class Printer {
     }
 
     void border(int width) {
-        out.println("+" + "-".repeat(width) + "+");
+        out.println("+" + "-".repeat(width) + "+" + "-".repeat(PANEL_WIDTH) + "+");
     }
 
     void printScore() {
@@ -79,5 +81,26 @@ public class Printer {
         Duration duration = timer.calculateElapsedDuration();
         String elapsedTime = String.format(TIME_FORMAT, duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
         out.println("Time: " + elapsedTime);
+    }
+
+    int PANEL_WIDTH = 6;
+
+    /**
+     * Prints # row of sidePanel with next block hint
+     *
+     * @param row number od row being printed
+     */
+    private void sidePanel(int row) {
+        startRow();
+        if (row <= hintBlock.rows()) {
+            if (row == 0) out.print("NEXT: ");
+            else {
+                for (int column = 0; column < PANEL_WIDTH; column++) {
+                    if (column < hintBlock.cols()) print(hintBlock.dotAt(row - 1, column));
+                    else out.print(" ");
+                }
+            }
+        } else out.print(" ".repeat(PANEL_WIDTH));
+        endRow();
     }
 }
