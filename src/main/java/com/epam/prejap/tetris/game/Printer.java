@@ -30,8 +30,7 @@ public class Printer {
         header();
         border(grid[0].length);
 
-        int row = 0;
-        for (; row < grid.length; row++) {
+        for (int row = 0; row < grid.length; row++) {
             startRow();
             for (byte aByte : grid[row]) {
                 print(aByte);
